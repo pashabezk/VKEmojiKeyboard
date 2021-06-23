@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Клавиатура</title>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="styles.css" type="text/css">
+		<script src="Res/jquery-3.6.0.min.js"></script>
+	</head>
+	<body>
+		<center>
+			<div id="parent">
+				<div id="stikers_keyboard">
+					<div id="stikers_keyboard_top">
+						
+					</div>
+					<div id="stikers_keyboard_bottom">
+						<div id="smile_icon_on_kb">
+							<img src="Img/Smile dark grey.svg"/>
+						</div>
+						<div><img src="Img/Clock.svg"/></div>
+					</div>
+				</div>
+				<div id="input_form">
+	  				<textarea  onkeyup="textAreaAdjust(this)" class="input_text" wrap="soft" placeholder="Ваше сообщение" rows="1"></textarea>
+					<img id="smile_icon" src="Img/Smile light grey.svg"/>
+				</div>				
+			</div>			
+		</center>
+	</body>
+</html>
+
+<script type="text/javascript">
+	function textAreaAdjust(o) {
+		textAreamaxHeight = 250;
+		o.style.height = "1px";
+		o.style.height = (o.scrollHeight<textAreamaxHeight ? o.scrollHeight : textAreamaxHeight)+"px";
+	}
+
+	//var person = JSON.parse("Res/Smiles.json");
+
+	// $(function(){
+	// 	$.getJSON("Res/Smiles.json", function(data) {
+	// 		$.each(data, function(key, val) {
+	//                     console.log(key);
+	//                     console.log(val);
+	//                 });
+	// 	});
+	// });
+
+	const text = `
+  
+    "title": "Эмоции",
+    "items": ["😀", "😃", "😄", "😁", "😅", "😆", "😂", "🤣", "😉", "😊", "☺", "🙂", "🙃", "😇", "😗", "😙", "😚", "😘", "😍", "🥰", "🤩", "🤗", "😋", "😜", "🤪", "😛", "😝", "🤑", "🤭", "🤐", "🤫", "😶", "🤔", "🤨", "🧐", "😐", "😑", "🙄", "😬", "🤥", "😏", "😌", "🤤", "😴", "🤓", "😎", "🥳", "🤠", "😒", "😔", "😪", "😕", "😟", "🙁", "☹", "😮", "😯", "😲", "😳", "🥺", "😦", "😧", "😨", "😰", "😥", "😢", "😭", "😱", "😖", "😣", "😞", "😓", "😩", "😫", "😷", "🤒", "🤕", "🤢", "🤮", "🤧", "🥶", "🥵", "🥴", "😵", "🤯", "😤", "😠", "😡", "🤬", "😈", "👿", "💀", "☠", "💩", "🤡", "👹", "👺", "👻", "👽", "👾", "🤖", "😺", "😸", "😹", "😻", "😼", "😽", "🙀", "😿", "😾", "🙈", "🙉", "🙊", "🦠"]
+  
+`;
+
+const obj = JSON.parse(text, function (key, value) {
+  console.log(key);
+});
+
+</script>
