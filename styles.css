@@ -7,6 +7,10 @@ img {
 	margin: 3px;
 }
 
+.icon:hover {
+	cursor: pointer;
+}
+
 #parent {
 	width: 100%;
 	height: 100%;
@@ -26,13 +30,16 @@ img {
 	height: 281px;
 	border: 1px solid #C5D0DB;
 	border-radius: 7px;
-	display: flex;
+	display: none;
 	flex-direction: column;
 }
 
 #stikers_keyboard_top {
-
 	flex: 1;
+	display: flex;
+	flex-direction: column;
+	overflow-y: auto;
+	overflow-x: hidden;
 }
 
 #stikers_keyboard_bottom {
@@ -41,7 +48,6 @@ img {
 	flex-direction: row;
 	background-color: #EBEEF2;
 	border-radius: 0 0 7px 7px;
-
 }
 
 #smile_icon_on_kb {
@@ -58,18 +64,45 @@ img {
 	display: flex;
 }
 
-.input_text {
+#input_text {
 	border: none;
 	/*vertical-align: bottom;*/
 	flex: 1;
 	resize: none;
 	font-family:"SFProDisplay";
-}
-
-.input_text:focus {
 	outline: none;
 }
 
 #smile_icon {
 	flex: 0 0 19px;
+}
+
+/*заголовки категорий смайликов*/
+.emoji_title {
+	font-family:"SFProDisplay";
+	font-size: 13px;
+	color: #939393;
+	text-align: left;
+	margin: 9px 0 5px 9px;
+}
+
+/*список смайликов категории*/
+.emoji_list {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: start;
+	margin: 0 0 0 9px;
+}
+
+/*собственно смайлик*/
+.emoji {
+	width: 26px;
+	height: 26px;
+}
+
+.emoji:hover {
+	background-color: #E5E5E5;
+	cursor: pointer;
+	border-radius: 5px;
 }
