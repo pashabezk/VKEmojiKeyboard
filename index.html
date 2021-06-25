@@ -3,6 +3,7 @@
 	<head>
 		<title>Клавиатура</title>
 		<meta charset="utf-8">
+		<meta name = "viewport" content = "width=device-width, initial-scale = 1">
 		<link rel="stylesheet" href="styles.css" type="text/css">
 		<!-- <script src="Res/jquery-3.6.0.min.js"></script> -->
 	</head>
@@ -10,7 +11,7 @@
 		<center>
 			<div id="parent">
 				<div id="stikers_keyboard">
-					<div id="stikers_keyboard_top">
+					<div id="stikers_keyboard_top" hidden>
 						
 					</div>
 					<div id="stikers_keyboard_bottom">
@@ -31,19 +32,34 @@
 
 <script type="text/javascript">
 
+	//установка клавиатуры эмодзи над textarea 
+	function setPositionEmojiKb() {
+		var stickersKb = document.getElementById("stikers_keyboard");
+		stickersKb.style.top = document.getElementById("input_form").getBoundingClientRect().top - stickersKb.offsetHeight + "px";
+	}
+
 	//функция раскрывает/скрывает клавиатуру со стикерами
 	function openHideStickersKb(obj) {		
 		var stickersKb = document.getElementById("stikers_keyboard");
 		if (stickersKb.style.display == "flex")
 			stickersKb.style.display = "none" ;
 		else stickersKb.style.display = "flex";
+
+		setPositionEmojiKb();
 	}
+
+	//событие при изменение размеров окна
+	window.addEventListener("resize", function() {
+		setPositionEmojiKb();
+	});
 
 	//функция изменения размера textarea в зависимости от содержимого
 	function textAreaAdjust(obj) {
 		textareaMaxHeight = 250;
 		obj.style.height = "1px"; //сбрасываем высоту textarea до 1px, чтобы появился scrollbar
 		obj.style.height = (obj.scrollHeight<textareaMaxHeight ? obj.scrollHeight : textareaMaxHeight)+"px"; //рассчитываем новую высоту, основываясь на scrollHeight
+
+		setPositionEmojiKb();
 	}
 
 	//функция обработки нажатия на смайлик
