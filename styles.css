@@ -67,9 +67,18 @@ img {
 	border-radius: 0 0 7px 7px;
 }
 
-#smile_icon_on_kb {
-	background: white;
+#icon_on_kb0 {
 	border-radius: 0 0 0 7px;
+}
+
+.icon_on_kb_selected {
+	background: white;
+	padding: 3px;
+}
+
+.icon_on_kb_unselected {
+	background: #EBEEF2;
+	padding: 3px;
 }
 
 /*Треугольник (под клавиатурой смайликов) - рамка треугольника*/

@@ -10,21 +10,23 @@
 	<body>
 		<div id="parent">
 				<div id="stikers_keyboard">
-					<div id="stikers_keyboard_top" hidden>
+					<div id="stikers_keyboard_top">
 						
 					</div>
 					<div id="stikers_keyboard_bottom">
-						<div id="smile_icon_on_kb">
+						<div id="icon_on_kb0" class="icon_on_kb_selected" onclick="clickOnEmojiBar(0)">
 							<img class="icon" src="Img/Smile dark grey.svg"/>
 						</div>
-						<div><img class="icon" src="Img/Clock.svg"/></div>
+						<div id="icon_on_kb1" class="icon_on_kb_unselected" onclick="clickOnEmojiBar(1)">
+							<img class="icon" src="Img/Clock.svg"/>
+						</div>
 					</div>
 					<div class="triangle"></div>
 				</div>
 			<div id="input_form">
   				<textarea id="input_text" wrap="soft" placeholder="Ваше сообщение" rows="1" onkeyup="textAreaAdjust(this)"></textarea>
   				<div id="smile_icon">
-					<img class="icon" src="Img/Smile light grey.svg" onclick="openHideStickersKb(this)"/>
+					<img class="icon" src="Img/Smile light grey.svg" onclick="openHideStickersKb()"/>
 				</div>
 			</div>				
 		</div>
@@ -33,20 +35,45 @@
 
 <script type="text/javascript">
 
+	var emojiBar = 0;
+	/*
+		Переменная, отвечающая за выбор пункта на панели смайлов (внизу клавиатуры со смайлами)
+		0 - список смайлов
+		1 - список последних смайлов
+	*/
+
+	//функция обработки нажатия на нижнюю панель смайлов (внизу клавиатуры со смайлами)
+	function clickOnEmojiBar(index) {
+		if (index != emojiBar) {
+			var changeToSelected = document.getElementById("icon_on_kb" + index);
+			var changeToUnselected = document.getElementById("icon_on_kb" + emojiBar);
+
+			changeToSelected.classList.remove("icon_on_kb_unselected");
+			changeToSelected.classList.add("icon_on_kb_selected");
+
+			changeToUnselected.classList.remove("icon_on_kb_selected");
+			changeToUnselected.classList.add("icon_on_kb_unselected");
+
+			emojiBar = index;
+			showEmojiBySelectOnBar();
+		}
+	}
+
 	//установка клавиатуры эмодзи над textarea 
 	function setPositionEmojiKb() {
 		var stickersKb = document.getElementById("stikers_keyboard");
-		stickersKb.style.top = document.getElementById("input_form").getBoundingClientRect().top - stickersKb.offsetHeight -10 +"px";
+		stickersKb.style.top = document.getElementById("input_form").getBoundingClientRect().top - stickersKb.offsetHeight - 10 +"px";
 	}
 
 	//функция раскрывает/скрывает клавиатуру со стикерами
-	function openHideStickersKb(obj) {		
+	function openHideStickersKb() {		
 		var stickersKb = document.getElementById("stikers_keyboard");
 		if (stickersKb.style.display == "flex")
 			stickersKb.style.display = "none" ;
 		else stickersKb.style.display = "flex";
 
 		setPositionEmojiKb();
+		//showEmojiBySelectOnBar();
 	}
 
 	//событие при изменение размеров окна
@@ -63,11 +90,27 @@
 		setPositionEmojiKb();
 	}
 
+	var lastEmojiList = new Array(); //список последних использованных смайлов
+	//lastEmojiList = document.cookie.replace(/(?:(?:^|.*;\s*)lastEmojiList\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+	//функция добавления смайла в список ранее использованных
+	function addToLastEmojiList(emoji) {
+		var pos = lastEmojiList.indexOf(emoji); //если такой смайл использовался ранее, то найти его позицию. Если такого смайла не было, то получится -1
+		if (pos != -1) {
+			lastEmojiList.splice(pos, 1) //в случае, если такой смайлик уже есть в ранее использованных, то удалить его из списка использованных смайлов
+		}
+		lastEmojiList.unshift(emoji); //добавить смайл в список
+		if (lastEmojiList.length > 25) //если список последних использованных смайлов больше 25, то удалить последний
+			lastEmojiList.pop();
+
+		//document.cookie = "lastEmojiList=" + JSON.stringify(lastEmojiList);
+	}
+
 	//функция обработки нажатия на смайлик
 	function emojiClick(obj) {
 		inputText = document.getElementById("input_text");
 		insertTextAtCursor(inputText, obj.innerText); //вставка смайлика
 		textAreaAdjust(inputText); //при необходимости - изменить размер textarea
+		addToLastEmojiList(obj.innerText); //отредактировать список последних использованных смайлов
 	}
 
 	//функция вставки текста в месте курсора/выделенного текста
@@ -94,7 +137,6 @@
 		"title": "Животные и растения",
 		"items": ["🐵", "🐒", "🦍", "🐶", "🐕", "🐩", "🐺", "🦊", "🦝", "🐱", "🐈", "🦁", "🐯", "🐅", "🐆", "🐴", "🐎", "🦄", "🦓", "🦌", "🐮", "🐂", "🐃", "🐄", "🐷", "🐽", "🐖", "🐗", "🐏", "🐑", "🐐", "🐪", "🐫", "🦙", "🦒", "🐘", "🦏", "🦛", "🐭", "🐁", "🐀", "🐹", "🐰", "🐇", "🐿", "🦔", "🦇", "🐻", "🐨", "🐼", "🦘", "🦡", "🐾", "🦃", "🐔", "🐓", "🐣", "🐤", "🐥", "🐦", "🐧", "🕊", "🦅", "🦆", "🦢", "🦉", "🦚", "🦜", "🐸", "🐊", "🐢", "🦎", "🐍", "🐲", "🐉", "🦕", "🦖", "🐳", "🐋", "🐬", "🐟", "🐠", "🐡", "🦈", "🐙", "🦀", "🦞", "🦐", "🦑", "🐚", "🐌", "🦋", "🐛", "🐜", "🐝", "🐞", "🦗", "🕷", "🕸", "🦂", "🦟", "💐", "🌸", "💮", "🏵", "🌹", "🥀", "🌺", "🌻", "🌼", "🌷", "🌳", "🌲", "🎄", "🌴", "🌵", "🌾", "🌱", "🌿", "☘", "🍀", "🍁", "🍂", "🍃", "🌑", "🌒", "🌓", "🌔", "🌕", "🌖", "🌗", "🌘", "🌙", "🌚", "🌛", "🌜", "🌡", "☀", "🌝", "🌞", "⭐", "🌟", "🌠", "☁", "⛅", "⛈", "🌤", "🌥", "🌦", "🌧", "🌨", "🌩", "🌪", "🌫", "🌬", "💨", "🌀", "🌈", "🌂", "☂", "☔", "⛱", "⚡", "❄", "☃", "⛄", "☄", "🔥", "💦", "💧", "🌊"]
 	},
-
 	{
 		"title": "Еда и напитки",
 		"items": ["🍏", "🍎", "🍐", "🍅", "🥝", "🍑", "🍒", "🍓", "🍇", "🍈", "🍉", "🍊", "🍋", "🍌", "🍍", "🥭", "🥥", "🥑", "🍆", "🥔", "🥕", "🌽", "🌶", "🥒", "🥬", "🥦", "🍄", "🥜", "🌰", "🍞", "🥐", "🥖", "🥨", "🥯", "🥞", "🧀", "🍖", "🍗", "🥩", "🥓", "🍔", "🍟", "🍕", "🌭", "🥪", "🌮", "🌯", "🥙", "🥚", "🍳", "🥘", "🍲", "🥣", "🥗", "🍿", "🧂", "🥫", "🍱", "🍘", "🍙", "🍚", "🍛", "🍜", "🍝", "🍠", "🍢", "🍣", "🍤", "🍥", "🥮", "🍡", "🥟", "🥠", "🥡", "🍦", "🍧", "🍨", "🍩", "🍪", "🎂", "🍰", "🧁", "🥧", "🍫", "🍬", "🍭", "🍮", "🍯", "🍼", "🥛", "☕", "🍵", "🍶", "🍾", "🍷", "🍸", "🍹", "🍺", "🍻", "🥂", "🥃", "🥤", "🥢", "🍽", "🍴", "🥄"]
@@ -123,6 +165,7 @@
 		//добавление заголовка категории смайликов
 		var newElement = document.createElement("p");
 		newElement.className = "emoji_title";
+		newElement.id = "emoji_title" + i; //добавление заголовку идентификатор, чтобы его можно было скрывать
 		newElement.innerHTML = jsonData[i].title;
 		stikersKeyboardTop.appendChild(newElement);
 
@@ -143,5 +186,73 @@
 			stikersByCategory.appendChild(newSmile);
 		}
 	}
+
+	//добавление заголовка для смайликов категории "Последние". Их индекс равен -1
+	var newElement = document.createElement("p");
+	newElement.id = "emoji_title-1";
+	newElement.className = "emoji_title";
+	newElement.innerHTML = "Последние";
+	stikersKeyboardTop.appendChild(newElement);
+
+	//добавление контейнера для смайликов категории "Последние". Их индекс равен -1
+	var newDiv = document.createElement("div");
+	newDiv.className = "emoji_list";
+	newDiv.id = "emoji_list-1";
+	stikersKeyboardTop.appendChild(newDiv);
+
+	//функция отображения списка смайликов: либо общий список, либо список последних
+	function showEmojiBySelectOnBar() {
+		if (emojiBar == 0) {
+			//необходимо скрыть список последних использованных смайлов
+			document.getElementById("emoji_title-1").style.display = 'none'; //скрыть заголовок
+			document.getElementById("emoji_list-1").style.display = 'none'; //скрыть блок со смайликами
+
+			//теперь необходимо отобразить список смайликов
+			for (var i = 0; i < jsonData.length; i++) {
+				document.getElementById("emoji_title" + i).style.display = 'block'; //скрыть заголовок
+				document.getElementById("emoji_list" + i).style.display = 'flex'; //скрыть блок со смайликами
+			}			
+		} else {
+			//необходимо скрыть список смайликов
+			for (var i = 0; i < jsonData.length; i++) {
+				document.getElementById("emoji_title" + i).style.display = 'none'; //скрыть заголовок
+				document.getElementById("emoji_list" + i).style.display = 'none'; //скрыть блок со смайликами
+			}
+
+			document.getElementById("emoji_title-1").style.display = 'block'; //отобразить категорию смайликов "последние"
+			var emojiList = document.getElementById("emoji_list-1");
+			emojiList.style.display = 'flex'; //отобразить список смайликов
+
+			emojiList.innerHTML = ""; //очистить список смайликов (необходимо, иначе будут дублироваться)
+
+			//заполнение таблицы смайликов последними использованными
+			for (var j = 0; j < lastEmojiList.length; j++) {
+				var newSmile = document.createElement("div");
+				newSmile.className = "emoji";
+				newSmile.innerHTML = lastEmojiList[j];
+				newSmile.setAttribute("onclick", "emojiClick(this)");
+				emojiList.appendChild(newSmile);
+			}
+		}
+	}
+
+	//создание прослушивателя на клавиатуру
+	document.addEventListener('keydown', function(event) {
+		document.getElementById("input_text").focus(); //сделать поле ввода в фокусе
+
+		//по нажатию на клавишу Tab открыть/закрыть клавиатуру со смайликами
+		if (event.key == 'Tab') {
+			openHideStickersKb();
+			event.preventDefault(); //запретить стандартное действие по клавише tab
+		}
+
+		//имитация отправки сообщения по нажатию ctrl + enter
+		if (event.ctrlKey && event.key == 'Enter') {
+			inputText = document.getElementById("input_text");
+			inputText.value = ""; //очистка формы ввода
+			textAreaAdjust(inputText);
+			alert("Сообщение отправлено");
+		}
+	});
 
 </script>
