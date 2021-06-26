@@ -27,7 +27,6 @@ img {
 
 #stikers_keyboard {
 	position: fixed;
-	/*bottom: 300px;*/
 	width: 290px;
 	height: 281px;
 	border: 1px solid #C5D0DB;
@@ -58,25 +57,41 @@ img {
 	border-radius: 0 0 0 7px;
 }
 
+/*Треугольник (под клавиатурой смайликов) - рамка треугольника*/
+.triangle::before, .triangle::after {
+	box-sizing: border-box;
+	content: ''; 
+	position: absolute;
+	right: 14px; bottom: -20px;
+	border: 10px solid transparent;
+	border-top: 10px solid #C5D0DB;
+}
+
+/*Треугольник - заливка*/
+.triangle::after {
+	border-top: 10px solid #EBEEF2;
+	bottom: -19px;
+}
+
 #input_form {
 	padding: 9px;
 	border: 1px solid #C5D0DB;
 	border-radius: 7px;
 	width: 272px;
-	/*height: 36px;	*/
 	display: flex;
 }
 
 #input_text {
 	border: none;
-	/*vertical-align: bottom;*/
 	flex: 1;
 	resize: none;
 	font-family:"SFProDisplay";
 	outline: none;
+	align-self: center;
 }
 
 #smile_icon {
+	align-self: top;
 	flex: 0 0 19px;
 }
 

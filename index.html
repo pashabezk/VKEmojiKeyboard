@@ -8,8 +8,7 @@
 		<!-- <script src="Res/jquery-3.6.0.min.js"></script> -->
 	</head>
 	<body>
-		<center>
-			<div id="parent">
+		<div id="parent">
 				<div id="stikers_keyboard">
 					<div id="stikers_keyboard_top" hidden>
 						
@@ -20,13 +19,15 @@
 						</div>
 						<div><img class="icon" src="Img/Clock.svg"/></div>
 					</div>
+					<div class="triangle"></div>
 				</div>
-				<div id="input_form">
-	  				<textarea id="input_text" wrap="soft" placeholder="Ваше сообщение" rows="1" onkeyup="textAreaAdjust(this)"></textarea>
-					<img id="smile_icon" class="icon" src="Img/Smile light grey.svg" onclick="openHideStickersKb(this)"/>
-				</div>				
-			</div>			
-		</center>
+			<div id="input_form">
+  				<textarea id="input_text" wrap="soft" placeholder="Ваше сообщение" rows="1" onkeyup="textAreaAdjust(this)"></textarea>
+  				<div id="smile_icon">
+					<img class="icon" src="Img/Smile light grey.svg" onclick="openHideStickersKb(this)"/>
+				</div>
+			</div>				
+		</div>
 	</body>
 </html>
 
@@ -35,7 +36,7 @@
 	//установка клавиатуры эмодзи над textarea 
 	function setPositionEmojiKb() {
 		var stickersKb = document.getElementById("stikers_keyboard");
-		stickersKb.style.top = document.getElementById("input_form").getBoundingClientRect().top - stickersKb.offsetHeight + "px";
+		stickersKb.style.top = document.getElementById("input_form").getBoundingClientRect().top - stickersKb.offsetHeight -10 +"px";
 	}
 
 	//функция раскрывает/скрывает клавиатуру со стикерами
@@ -77,8 +78,7 @@
 	}	
 
 	const emojiJSON = `
-[
-	{
+	[{
 		"title": "Эмоции",
 		"items": ["😀", "😃", "😄", "😁", "😅", "😆", "😂", "🤣", "😉", "😊", "☺", "🙂", "🙃", "😇", "😗", "😙", "😚", "😘", "😍", "🥰", "🤩", "🤗", "😋", "😜", "🤪", "😛", "😝", "🤑", "🤭", "🤐", "🤫", "😶", "🤔", "🤨", "🧐", "😐", "😑", "🙄", "😬", "🤥", "😏", "😌", "🤤", "😴", "🤓", "😎", "🥳", "🤠", "😒", "😔", "😪", "😕", "😟", "🙁", "☹", "😮", "😯", "😲", "😳", "🥺", "😦", "😧", "😨", "😰", "😥", "😢", "😭", "😱", "😖", "😣", "😞", "😓", "😩", "😫", "😷", "🤒", "🤕", "🤢", "🤮", "🤧", "🥶", "🥵", "🥴", "😵", "🤯", "😤", "😠", "😡", "🤬", "😈", "👿", "💀", "☠", "💩", "🤡", "👹", "👺", "👻", "👽", "👾", "🤖", "😺", "😸", "😹", "😻", "😼", "😽", "🙀", "😿", "😾", "🙈", "🙉", "🙊", "🦠"]
 	},
