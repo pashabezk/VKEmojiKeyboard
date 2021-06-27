@@ -108,10 +108,11 @@ img {
 #input_text {
 	border: none;
 	flex: 1;
-	resize: none;
+	max-width: 240px;
 	font-family:"SFProDisplay";
 	outline: none;
 	align-self: center;
+	overflow: auto;
 }
 
 #smile_icon {

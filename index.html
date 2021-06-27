@@ -5,7 +5,6 @@
 		<meta charset="utf-8">
 		<meta name = "viewport" content = "width=device-width, initial-scale = 1">
 		<link rel="stylesheet" href="styles.css" type="text/css">
-		<!-- <script src="Res/jquery-3.6.0.min.js"></script> -->
 	</head>
 	<body>
 		<div id="parent">
@@ -24,7 +23,8 @@
 					<div class="triangle"></div>
 				</div>
 			<div id="input_form">
-  				<textarea id="input_text" wrap="soft" placeholder="Ваше сообщение" rows="1" onkeyup="textAreaAdjust(this)"></textarea>
+				<div contenteditable="true" id="input_text" wrap="soft" placeholder="Ваше сообщение" onkeyup="textAreaAdjust()">
+				</div>
   				<div id="smile_icon">
 					<img class="icon" src="Img/Smile light grey.svg" onclick="openHideStickersKb()"/>
 				</div>
@@ -34,6 +34,100 @@
 </html>
 
 <script type="text/javascript">
+
+	//создание аналога placeholder для div contenteditable
+	//вывести сообщение из placeholder
+	inputText = document.getElementById("input_text");
+	inputText.innerText = inputText.getAttribute("placeholder");
+	inputText.style.color = "grey";
+
+	//добавить прослушиватель на фокус div contenteditable
+	//в случае фокуса необходимо убрать надпись из placeholder
+	inputText.addEventListener("focusin", function() {
+		if (inputText.style.color == "grey") {
+			inputText.innerText = "";
+		}
+		inputText.style.color = "black";
+		inputText.focus();
+	});
+
+	//добавить прослушиватель на сдвиг фокуса с div contenteditable
+	//если при этом div contenteditable пустой, то необходимо добавить в него надпись из placeholder
+	inputText.addEventListener("focusout", function() {
+		if (inputText.innerText == "") {
+			inputText.innerText = inputText.getAttribute("placeholder");
+			inputText.style.color = "grey";
+		}
+	});
+
+	var sel = window.getSelection(), range; //переменные, хранящие место каретки вводимого поля
+
+	//функция изменения размера textarea в зависимости от содержимого
+	function textAreaAdjust() {
+		textareaMaxHeight = 250;
+		inputText.style.height = "20px"; //сбрасываем высоту поля ввода до 20px, чтобы появился scrollbar
+		inputText.style.height = (inputText.scrollHeight<textareaMaxHeight ? inputText.scrollHeight : textareaMaxHeight)+"px"; //рассчитываем новую высоту, основываясь на scrollHeight
+	
+		setPositionEmojiKb(); //при необходимости меняем высоту клавиатуры
+	}
+
+	//функция вставки текста в месте курсора/выделенного текста
+	function insertTextAtCursor(el, text) {
+		range.collapse(false);
+		var span = document.createElement("span")
+		span.innerHTML = text;
+		range.insertNode(span);
+	}
+
+	//функция выделения ссылок (включая эл. почу, телефон, обращения (@user or *user))
+	function underlineLinks() {
+		inputText.innerHTML = inputText.innerText.replaceAll(
+			/([\w]+@[\w]+\.[\w]+)|(\#[\w\.\@]+)|(\@[\w\.]+)|(\*[\w\.]+)|(\+?[\-\d()]{5,})|([\w]+\.[\w]{2,})/g,
+			"<span style='color:blue;text-decoration:underline'>$&</span>"
+		);
+
+		//помещение каретки в конец поля ввода
+		range.setStart(inputText.lastChild, inputText.lastChild.length);
+		range.collapse(false);
+		let selection = document.getSelection();
+		selection.removeAllRanges();
+		selection.addRange(range);
+	}
+
+	//установка клавиатуры эмодзи над textarea 
+	function setPositionEmojiKb() {
+		var stickersKb = document.getElementById("stikers_keyboard");
+		stickersKb.style.top = document.getElementById("input_form").getBoundingClientRect().top - stickersKb.offsetHeight - 10 +"px";
+	}
+
+	//функция раскрывает/скрывает клавиатуру со стикерами
+	function openHideStickersKb() {		
+		var stickersKb = document.getElementById("stikers_keyboard");
+		if (stickersKb.style.display == "flex")
+			stickersKb.style.display = "none" ;
+		else stickersKb.style.display = "flex";
+
+		setPositionEmojiKb();
+	}
+
+	var lastEmojiList = new Array(); //список последних использованных смайлов
+	//функция добавления смайла в список ранее использованных
+	function addToLastEmojiList(emoji) {
+		var pos = lastEmojiList.indexOf(emoji); //если такой смайл использовался ранее, то найти его позицию. Если такого смайла не было, то получится -1
+		if (pos != -1) {
+			lastEmojiList.splice(pos, 1) //в случае, если такой смайлик уже есть в ранее использованных, то удалить его из списка использованных смайлов
+		}
+		lastEmojiList.unshift(emoji); //добавить смайл в список
+		if (lastEmojiList.length > 25) //если список последних использованных смайлов больше 25, то удалить последний
+			lastEmojiList.pop();
+	}
+
+	//функция обработки нажатия на смайлик
+	function emojiClick(obj) { /*------------------------------------------------------------------------------------*/
+		insertTextAtCursor(inputText, obj.innerText); //вставка смайлика
+		textAreaAdjust(); //при необходимости - изменить размер textarea
+		addToLastEmojiList(obj.innerText); //отредактировать список последних использованных смайлов
+	}
 
 	var emojiBar = 0;
 	/*
@@ -58,67 +152,6 @@
 			showEmojiBySelectOnBar();
 		}
 	}
-
-	//установка клавиатуры эмодзи над textarea 
-	function setPositionEmojiKb() {
-		var stickersKb = document.getElementById("stikers_keyboard");
-		stickersKb.style.top = document.getElementById("input_form").getBoundingClientRect().top - stickersKb.offsetHeight - 10 +"px";
-	}
-
-	//функция раскрывает/скрывает клавиатуру со стикерами
-	function openHideStickersKb() {		
-		var stickersKb = document.getElementById("stikers_keyboard");
-		if (stickersKb.style.display == "flex")
-			stickersKb.style.display = "none" ;
-		else stickersKb.style.display = "flex";
-
-		setPositionEmojiKb();
-		//showEmojiBySelectOnBar();
-	}
-
-	//событие при изменение размеров окна
-	window.addEventListener("resize", function() {
-		setPositionEmojiKb();
-	});
-
-	//функция изменения размера textarea в зависимости от содержимого
-	function textAreaAdjust(obj) {
-		textareaMaxHeight = 250;
-		obj.style.height = "1px"; //сбрасываем высоту textarea до 1px, чтобы появился scrollbar
-		obj.style.height = (obj.scrollHeight<textareaMaxHeight ? obj.scrollHeight : textareaMaxHeight)+"px"; //рассчитываем новую высоту, основываясь на scrollHeight
-
-		setPositionEmojiKb();
-	}
-
-	var lastEmojiList = new Array(); //список последних использованных смайлов
-	//lastEmojiList = document.cookie.replace(/(?:(?:^|.*;\s*)lastEmojiList\s*\=\s*([^;]*).*$)|^.*$/, "$1");
-	//функция добавления смайла в список ранее использованных
-	function addToLastEmojiList(emoji) {
-		var pos = lastEmojiList.indexOf(emoji); //если такой смайл использовался ранее, то найти его позицию. Если такого смайла не было, то получится -1
-		if (pos != -1) {
-			lastEmojiList.splice(pos, 1) //в случае, если такой смайлик уже есть в ранее использованных, то удалить его из списка использованных смайлов
-		}
-		lastEmojiList.unshift(emoji); //добавить смайл в список
-		if (lastEmojiList.length > 25) //если список последних использованных смайлов больше 25, то удалить последний
-			lastEmojiList.pop();
-
-		//document.cookie = "lastEmojiList=" + JSON.stringify(lastEmojiList);
-	}
-
-	//функция обработки нажатия на смайлик
-	function emojiClick(obj) {
-		inputText = document.getElementById("input_text");
-		insertTextAtCursor(inputText, obj.innerText); //вставка смайлика
-		textAreaAdjust(inputText); //при необходимости - изменить размер textarea
-		addToLastEmojiList(obj.innerText); //отредактировать список последних использованных смайлов
-	}
-
-	//функция вставки текста в месте курсора/выделенного текста
-	function insertTextAtCursor(el, text) {
-		var endIndex = el.selectionEnd, startIndex = el.selectionStart; //получение стартовой позиции начала выделенного текста и конца. Если выделенного текста нет, то начало и конец совпадают
-		el.value = el.value.slice(0, startIndex) + text + el.value.slice(endIndex); //замещение выделенного текста необходимым
-		el.selectionEnd = el.selectionStart = startIndex + text.length; //перемещение каретки в место, после вставленного текста
-	}	
 
 	const emojiJSON = `
 	[{
@@ -236,10 +269,25 @@
 		}
 	}
 
+	//событие при изменение размеров окна
+	window.addEventListener("resize", function() {
+		setPositionEmojiKb();
+	});
+
+	//прослушиватель на нажатия на поле ввода (чтобы запомнить позицию каретки)
+	inputText.onclick = function() {
+		sel = window.getSelection();
+		range = sel.getRangeAt(0);
+	};
+
+	//прослушиватель на клавиатуру на поле ввода (чтобы запомнить позицию каретки)
+	inputText.addEventListener('keyup', function(event) {
+		sel = window.getSelection();
+		range = sel.getRangeAt(0);
+	});
+
 	//создание прослушивателя на клавиатуру
 	document.addEventListener('keydown', function(event) {
-		document.getElementById("input_text").focus(); //сделать поле ввода в фокусе
-
 		//по нажатию на клавишу Tab открыть/закрыть клавиатуру со смайликами
 		if (event.key == 'Tab') {
 			openHideStickersKb();
@@ -248,11 +296,7 @@
 
 		//имитация отправки сообщения по нажатию ctrl + enter
 		if (event.ctrlKey && event.key == 'Enter') {
-			inputText = document.getElementById("input_text");
-			inputText.value = ""; //очистка формы ввода
-			textAreaAdjust(inputText);
-			alert("Сообщение отправлено");
+			underlineLinks();
 		}
 	});
-
 </script>
