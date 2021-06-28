@@ -202,6 +202,10 @@
 	}
 
 	var lastEmojiList = new Array(); //список последних использованных смайлов
+	if (document.cookie != "") {
+		lastEmojiList = document.cookie.replace('lastEmojiList=', "").split(',');
+	}
+
 	//функция добавления смайла в список ранее использованных
 	function addToLastEmojiList(emoji) {
 		var pos = lastEmojiList.indexOf(emoji); //если такой смайл использовался ранее, то найти его позицию. Если такого смайла не было, то получится -1
@@ -211,6 +215,8 @@
 		lastEmojiList.unshift(emoji); //добавить смайл в список
 		if (lastEmojiList.length > 25) //если список последних использованных смайлов больше 25, то удалить последний
 			lastEmojiList.pop();
+
+		document.cookie = "lastEmojiList=" + lastEmojiList.toString();
 	}
 
 	//функция обработки нажатия на смайлик
