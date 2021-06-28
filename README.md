@@ -2,7 +2,7 @@
 
 Веб-приложение представляет собой поле ввода с интерфейсом для добавления emoji.
 
-![EmojiKeyboard](ImgForReadme/EmojiKB.jpg "EmojiKB")
+![EmojiKeyboard](ImgForReadme/EmojiKB.png "EmojiKB")
 
 > Приложение написано с помощью HTML, CSS, JavaScript. Без применения фреймворков.
 
