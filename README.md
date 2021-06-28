@@ -42,7 +42,7 @@
 Приложение расположено на хостинге `Heroku`: https://vkemojikeyboard.herokuapp.com/index.html
 
 > Работоспособность приложения проверена в браузерах:
->  Google Chrome (91.0.4472.114) (Windows 10);
->  Microsoft Edge (91.0.864.59) (Windows 10);
->  Google Chrome (91.0.4472.120) (Android);
->  Samsung Internet (14.2.1.69) (Android).
+> * Google Chrome (91.0.4472.114) (Windows 10);
+> * Microsoft Edge (91.0.864.59) (Windows 10);
+> * Google Chrome (91.0.4472.120) (Android);
+> * Samsung Internet (14.2.1.69) (Android).
