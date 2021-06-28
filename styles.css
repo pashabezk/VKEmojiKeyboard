@@ -17,8 +17,23 @@
 	background: #99A2AD;
 }
 
+.links {
+	color:blue;
+	/*text-decoration:underline;*/
+}
+
 img {
 	margin: 3px;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+	-webkit-user-drag: none;
+	-khtml-user-drag: none;
+	-moz-user-drag: none;
+	-o-user-drag: none;
+	user-drag: none;
 }
 
 .icon:hover {
@@ -143,6 +158,12 @@ img {
 .emoji {
 	width: 26px;
 	height: 26px;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+	user-select: none;
 }
 
 .emoji:hover {

@@ -23,7 +23,7 @@
 					<div class="triangle"></div>
 				</div>
 			<div id="input_form">
-				<div contenteditable="true" id="input_text" wrap="soft" placeholder="Ваше сообщение" onkeyup="textAreaAdjust()">
+				<div contenteditable="true" id="input_text" wrap="soft" placeholder="Ваше сообщение" oninput="onInput(event)" onkeyup="textAreaAdjust()">
 				</div>
   				<div id="smile_icon">
 					<img class="icon" src="Img/Smile light grey.svg" onclick="openHideStickersKb()"/>
@@ -35,9 +35,19 @@
 
 <script type="text/javascript">
 
+	var inputText = document.getElementById("input_text");
+
+	var caretPosition = 0; //хранит позицию каретки
+	var range; //тоже хранит позицию каретки
+	var regEx = /([\w]+@[\w]+\.[\w]+)|(\#[\w\.\@А-Яа-я]+)|(\@[\w\.]+)|(\*[\w\.]+)|(\+?[\-\d()]{5,})|((https?:)?[\w/\.]+\.[\w/]{2,})/g; //регулярное выражение для ссылок (включая эл. почу, телефон, обращения (@user or *user), хэштеги)
+
+	//нужно получить range поля ввода, для этого искуственно создаем на нем фокус, а потом убираем
+	inputText.focus();
+	inputText.blur();
+	range = window.getSelection().getRangeAt(0);
+
 	//создание аналога placeholder для div contenteditable
 	//вывести сообщение из placeholder
-	inputText = document.getElementById("input_text");
 	inputText.innerText = inputText.getAttribute("placeholder");
 	inputText.style.color = "grey";
 
@@ -60,7 +70,90 @@
 		}
 	});
 
-	var sel = window.getSelection(), range; //переменные, хранящие место каретки вводимого поля
+	function getCaretCharacterOffsetWithin(element) {
+		var caretOffset = 0;
+		var doc = element.ownerDocument || element.document;
+		var sel;
+		if (typeof window.getSelection != "undefined") {
+			sel = window.getSelection(); //получаем выделенную область
+			//если выделение есть
+			if (sel.rangeCount > 0) {
+				var range = window.getSelection().getRangeAt(0); //получаем текущее значение range
+				var preCaretRange = range.cloneRange(); //копируем состояние range
+				preCaretRange.selectNodeContents(element); //указываем в качестве контекста element
+				preCaretRange.setEnd(range.endContainer, range.endOffset); //задаём начало и конец выделения
+				caretOffset = preCaretRange.toString().length; //превращаем range в строку и вычисляем её длину - это длина смещения
+			}
+		} else if ((sel = doc.selection) && sel.type != "Control") {
+		    var textRange = sel.createRange();
+		    var preCaretTextRange = doc.body.createTextRange();
+		    preCaretTextRange.moveToElementText(element);
+		    preCaretTextRange.setEndPoint("EndToEnd", textRange);
+		    caretOffset = preCaretTextRange.text.length;
+		}
+		return caretOffset;
+	}
+
+	function setCaretPosition(element, offset) {
+		var range = document.createRange();
+		var sel = window.getSelection();
+
+		var currentNode = null;
+		var previousNode = null;
+
+		//необходимо обойти по всем потомкам element
+		//обход по div'ам
+		for (var i = 0; i < element.childNodes.length; i++) {
+			//внутри div может быть node типа text или span
+			for (var j = 0; j < element.childNodes[i].childNodes.length; j++) {
+				previousNode = currentNode; //сохраняем предыдущего потомка
+				currentNode = element.childNodes[i].childNodes[j]; //получаем текущего потомка
+
+				//если внутри есть span, то надо в качестве currentNode взять потомка span (это будет node text)
+				while(currentNode.childNodes.length > 0){
+					currentNode = currentNode.childNodes[0];
+				}
+
+				//общитываем смещение относительно предыдущего дочернего элемента
+				if (previousNode != null) {
+				    offset -= previousNode.length;
+				}
+				//если длина смещения меньше длины текущего элемента, то оборвать цикл
+				if (offset <= currentNode.length) {
+					break;
+				}
+			}
+			if ((currentNode != null)&&(offset <= currentNode.length)) {
+				break;
+			}
+		}
+
+		//перемещаем каретку к текущему элементу
+		if (currentNode != null) {
+			range.setStart(currentNode, offset);
+			range.collapse(true);
+			sel.removeAllRanges();
+			sel.addRange(range);
+		}
+	}
+
+	function onInput(event) {
+		//если тип действия не вставка абзаца (enter)
+		if (event.inputType != 'insertParagraph') {
+			caretPosition = getCaretCharacterOffsetWithin(inputText);
+			var text = "<div>" + inputText.innerText +"</div>";
+			text = text.replaceAll("\n", "</div><div>");
+			text = text.replace(regEx, "<span class='links'>$&</span>");
+			inputText.innerHTML = text;
+			setCaretPosition(inputText, caretPosition);
+		}
+	}
+
+	//прослушиватель на нажатия на поле ввода (чтобы запомнить позицию каретки)
+	inputText.onclick = function() {
+		caretPosition = getCaretCharacterOffsetWithin(inputText);
+		range = window.getSelection().getRangeAt(0); //получаем текущее значение range
+	};
 
 	//функция изменения размера textarea в зависимости от содержимого
 	function textAreaAdjust() {
@@ -72,26 +165,24 @@
 	}
 
 	//функция вставки текста в месте курсора/выделенного текста
-	function insertTextAtCursor(el, text) {
+	function insertTextAtCursor(insertText) {
+		//если в поле ввода находится placeholder, то необходимо его убрать
+		if (inputText.style.color == "grey") {
+			inputText.innerText = "";
+			inputText.style.color = "black";
+		}
+
 		range.collapse(false);
 		var span = document.createElement("span")
-		span.innerHTML = text;
+		span.innerHTML = insertText;
 		range.insertNode(span);
 	}
 
-	//функция выделения ссылок (включая эл. почу, телефон, обращения (@user or *user))
-	function underlineLinks() {
-		inputText.innerHTML = inputText.innerText.replaceAll(
-			/([\w]+@[\w]+\.[\w]+)|(\#[\w\.\@]+)|(\@[\w\.]+)|(\*[\w\.]+)|(\+?[\-\d()]{5,})|([\w]+\.[\w]{2,})/g,
-			"<span style='color:blue;text-decoration:underline'>$&</span>"
-		);
-
-		//помещение каретки в конец поля ввода
-		range.setStart(inputText.lastChild, inputText.lastChild.length);
-		range.collapse(false);
-		let selection = document.getSelection();
-		selection.removeAllRanges();
-		selection.addRange(range);
+	//функция очистки поля ввода
+	function clearInputText() {
+		inputText.innerHTML = "<div></div>" //очистка формы ввода
+		caretPosition = 0;
+		textAreaAdjust();
 	}
 
 	//установка клавиатуры эмодзи над textarea 
@@ -123,8 +214,8 @@
 	}
 
 	//функция обработки нажатия на смайлик
-	function emojiClick(obj) { /*------------------------------------------------------------------------------------*/
-		insertTextAtCursor(inputText, obj.innerText); //вставка смайлика
+	function emojiClick(obj) {
+		insertTextAtCursor(obj.innerText); //вставка смайлика
 		textAreaAdjust(); //при необходимости - изменить размер textarea
 		addToLastEmojiList(obj.innerText); //отредактировать список последних использованных смайлов
 	}
@@ -274,20 +365,25 @@
 		setPositionEmojiKb();
 	});
 
-	//прослушиватель на нажатия на поле ввода (чтобы запомнить позицию каретки)
-	inputText.onclick = function() {
-		sel = window.getSelection();
-		range = sel.getRangeAt(0);
-	};
-
-	//прослушиватель на клавиатуру на поле ввода (чтобы запомнить позицию каретки)
-	inputText.addEventListener('keyup', function(event) {
-		sel = window.getSelection();
-		range = sel.getRangeAt(0);
+	document.addEventListener('keyup', function(event) {
+		range = window.getSelection().getRangeAt(0); //получаем текущее значение range
 	});
 
 	//создание прослушивателя на клавиатуру
 	document.addEventListener('keydown', function(event) {
+		//если поля ввода не в фокусе, то перенести фокус на него
+		if (document.activeElement != inputText) {
+			if (((event.key >= '0') && (event.key <= '9')) || (event.key >= ' ') ||
+				((event.key >= 'A') && (event.key <= 'Z')) || ((event.key >= 'a') && (event.key <= 'z')) ||
+				((event.key >= 'А') && (event.key <= 'Я')) || ((event.key >= 'а') && (event.key <= 'я'))) {
+				if(caretPosition == 0) {
+					inputText.focus();
+				} else {
+					setCaretPosition(inputText, caretPosition);
+				}
+			}
+		}
+
 		//по нажатию на клавишу Tab открыть/закрыть клавиатуру со смайликами
 		if (event.key == 'Tab') {
 			openHideStickersKb();
@@ -296,7 +392,8 @@
 
 		//имитация отправки сообщения по нажатию ctrl + enter
 		if (event.ctrlKey && event.key == 'Enter') {
-			underlineLinks();
+			alert("Сообщение отправлено. Текст сообщения:\n" + inputText.innerText);
+			clearInputText();
 		}
 	});
 </script>
